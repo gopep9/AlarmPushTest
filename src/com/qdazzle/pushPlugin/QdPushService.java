@@ -25,6 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.example.pushtest.R;
+import java.lang.reflect.Method;
+
 //import org.json.JSONArray;
 //import org.json.JSONObject;
 
@@ -32,10 +35,15 @@ import com.qdazzle.pushPlugin.aidl.INotificationService;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.icu.util.Calendar;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -159,6 +167,16 @@ public class QdPushService extends Service{
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
 		Log.i(TAG, "onStartCommand1");
+		
+		
+		//测试，在开启服务的时候设置一个闹钟
+		Intent broadcastIntent=new Intent(this,AlarmReceiver.class);
+		PendingIntent sender=PendingIntent.getBroadcast(this, 0, broadcastIntent, 0);
+		Calendar calendar=Calendar.getInstance();
+		calendar.setTimeInMillis(System.currentTimeMillis());
+		calendar.add(Calendar.SECOND, 300);
+		AlarmManager alarmManager=(AlarmManager)getSystemService(ALARM_SERVICE);
+		alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), sender);
 		
 		//在初始化的时候接收intent传过来的数据
 		String url=intent.getStringExtra("url");
@@ -464,28 +482,7 @@ public class QdPushService extends Service{
 			strLastNotificationId="0";
 		return Integer.valueOf(strLastNotificationId);
 	}
-	
-	//感觉可以去掉，假如没有在跑的话也不能跑，能够推送成功的一定是线程在跑的
-	private boolean checkForground()
-	{
-		/*
-		 * check if process is on foreground
-		 */
-		boolean hasForeground = false;
-		ActivityManager activitymanager = (ActivityManager) QdPushService.this
-				.getSystemService(ACTIVITY_SERVICE);
-		List<RunningAppProcessInfo> procInfos = activitymanager
-				.getRunningAppProcesses();
-		for (RunningAppProcessInfo info : procInfos)
-		{
-			if (info.processName.equals(mForgroundProcName))
-			{
-				hasForeground = true;
-			}
-		}
-		return hasForeground;
-	}
-	
+		
 	private void checkLocalPush(boolean hasForeground)
 	{
 		/*
@@ -659,5 +656,14 @@ public class QdPushService extends Service{
 			Log.e(TAG,"connect error:"+e.toString());
 		}
 		return "";
+	}
+	
+	//使用这个函数代替checkLocalPush
+	private void setAlertToPush(boolean hasForeground)
+	{
+		Bundle bundle=new Bundle();
+//		bundle.putInt(START_SERVICE_TYPE, TYPE_REQUEST);
+//		PendingIntent pendingIntent=getPendingIntent
+		
 	}
 }

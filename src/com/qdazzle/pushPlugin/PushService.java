@@ -45,29 +45,6 @@ public class PushService extends QdPushService
 			return;
 		}
 		this.getNotificationManager().notify(id,messageNotification);
-//		Intent broadcastIntent = new Intent(this, NotificationReceiver.class);
-//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//		
-//
-//		n.flags |= Notification.FLAG_SHOW_LIGHTS;
-//		n.flags |= Notification.FLAG_AUTO_CANCEL;
-//
-//		n.defaults = Notification.DEFAULT_ALL;
-//
-//		n.icon = R.drawable.app_icon;    //2130837504;
-//		
-//		
-//		
-//		
-//		
-//		
-//		n.when = System.currentTimeMillis();
-//
-//
-//
-//		n.setLatestEventInfo(this, title, content, pendingIntent);
-//		
-//		this.getNotificationManager().notify(id, n);
 	}
 	
 	@Override
