@@ -26,36 +26,22 @@
             </intent-filter>
         </activity>
         <receiver 
-            android:name="com.example.pushtest.PushReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter >
-                <action android:name="com.example.pushtest.PushReceiverAction"/>
-            </intent-filter>
-            
-            </receiver>
-        <receiver 
             android:name="com.qdazzle.pushPlugin.AlarmReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter >
                 <action android:name="com.qdazzle.pushPlugin.AlarmReceiverAction"/>
-            </intent-filter>
-            
-            </receiver>
-        
+            </intent-filter>  
+        </receiver>
         <receiver 
-            android:name="com.qdazzle.pushPlugin.NotificationReceiver"
-            android:enabled="true" 
+            android:name="com.qdazzle.pushPlugin.SetAlarmReceiver"
+            android:enabled="true"
             android:exported="true">
             <intent-filter >
-                <action android:name="com.qdazzle.pushPlugin.PushReceiverAction"/>
-            </intent-filter>
+                <action android:name="com.qdazzle.pushPlugin.SetAlarmReceiverAction"/>
+            </intent-filter>  
         </receiver>
-        <!--  PushService -->
-        <service android:name="com.qdazzle.pushPlugin.PushService"
-            android:enabled="true"
-            android:process=":push" />
+        
     </application>
 
 </manifest>
