@@ -25,7 +25,6 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 	@Override
 	public void onReceive(final Context context,final Intent intent) {
 		
-		
 		Thread thread = new Thread(new Runnable() {
 
 			@Override
@@ -148,5 +147,4 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 			aManager.set(AlarmManager.RTC_WAKEUP,triggerTimeMinute*1000*60,pendingIntent);
 		}
 	}
-	
 }
