@@ -169,17 +169,7 @@ public class QdPushService extends Service{
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
 		Log.i(TAG, "onStartCommand1");
-		
-		
-		//测试，在开启服务的时候设置一个闹钟
-		Intent broadcastIntent=new Intent(this,AlarmReceiver.class);
-		PendingIntent sender=PendingIntent.getBroadcast(this, 0, broadcastIntent, 0);
-		Calendar calendar=Calendar.getInstance();
-		calendar.setTimeInMillis(System.currentTimeMillis());
-		calendar.add(Calendar.SECOND, 300);
-		AlarmManager alarmManager=(AlarmManager)getSystemService(ALARM_SERVICE);
-		alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), sender);
-		
+				
 		//在初始化的时候接收intent传过来的数据
 		String url=intent.getStringExtra("url");
 		int port=intent.getIntExtra("port", 80);
