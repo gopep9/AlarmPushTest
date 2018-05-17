@@ -23,77 +23,84 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 	static int lastNotificationId=0;
 	private final String TAG=SetAlarmReceiver.class.getName();
 	@Override
-	public void onReceive(Context context, Intent intent) {
+	public void onReceive(final Context context,final Intent intent) {
 		
-		// TODO Auto-generated method stub
-		Log.i(TAG,"onReceiver and intent is "+intent.toString());
-		Log.i(TAG,"current minute "+System.currentTimeMillis()/1000/60);
-		Log.i(TAG,"current lastNotificationId "+lastNotificationId);
-		String url=intent.getStringExtra("url");
-		int port=intent.getIntExtra("port", 80);
-		String platformId=intent.getStringExtra("platformId");
-		String channelId=intent.getStringExtra("channelId");
-		String NotificationPackId=intent.getStringExtra("NotificationPackId");
-		String packageId=intent.getStringExtra("packageId");
 		
-		String requestStr=url+"?platformId="+platformId+"&channelId="+channelId;
-		String responseStr=getServerPushMessage(10, requestStr, port);
-		if(responseStr==null||responseStr=="")
-		{
-			return;
-		}
-		JSONObject jObject;
-		int code=0;
-		String tickerText="";
-		String title="";
-		String content="";
-		int triggeringTime=0;
-		int NotificationId=0;
-		try {
-			jObject=new JSONObject(responseStr);
-			code=jObject.getInt("code");
-			if(0==code)
-			{
-//				tickerText=jObject.getString("tickerText");
-//				title=jObject.getString("title");
-//				content=jObject.getString("content");
-//				triggeringTime=jObject.getString("triggeringTime");
-//				NotificationId=jObject.getString("NotificationId");
-				JSONArray jsonArrays=jObject.getJSONArray("pushMessageArray");
-				int tmpMaxNotificationId=0;
-				for(int i=0;i<jsonArrays.length();i++)
-				{	
-					JSONObject jsonArray=jsonArrays.getJSONObject(i);
-					tickerText=jsonArray.getString("tickerText");
-					title=jsonArray.getString("title");
-					content=jsonArray.getString("content");
-					triggeringTime=jsonArray.getInt("triggeringTime");
-					NotificationId=jsonArray.getInt("NotificationId");
-					if((triggeringTime>System.currentTimeMillis()/1000/60)&&(NotificationId>lastNotificationId)) {
-						addAlarmToNotification(NotificationId, triggeringTime, title, content, tickerText,context);
-//						scheduleNotificationInService(NotificationId, triggeringTime, title, content, tickerText, 0);
-						if(tmpMaxNotificationId<NotificationId)
-						{
-							Log.i(TAG,"NotificationId is:"+NotificationId);
-							tmpMaxNotificationId=NotificationId;
-						}
-					}
-				}
-				if(tmpMaxNotificationId!=0)
+		Thread thread = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				Log.i(TAG,"onReceiver and intent is "+intent.toString());
+				Log.i(TAG,"current minute "+System.currentTimeMillis()/1000/60);
+				Log.i(TAG,"current lastNotificationId "+lastNotificationId);
+				String url=intent.getStringExtra("url");
+				int port=intent.getIntExtra("port", 80);
+				String platformId=intent.getStringExtra("platformId");
+				String channelId=intent.getStringExtra("channelId");
+				String NotificationPackId=intent.getStringExtra("NotificationPackId");
+				String packageId=intent.getStringExtra("packageId");
+				
+				String requestStr=url+"?platformId="+platformId+"&channelId="+channelId;
+				String responseStr=getServerPushMessage(10, requestStr, port);
+				if(responseStr==null||responseStr=="")
 				{
-					lastNotificationId=tmpMaxNotificationId;
-					Log.i(TAG,"set lastNotificationId is tmpMaxNotificationId:"+lastNotificationId);
-					//有更改的，要更新一下本地文件，更改为不在这里更新，而是设置mNotificationsModify之后在检查本地推送的时候统一更新
-				}else {
-					Log.i(TAG,"tmpMaxNotificationId value:"+tmpMaxNotificationId);
+					return;
 				}
-			}else {
-				Log.i(TAG,"receivePushMessage getString:"+responseStr);
-			}
-		}catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
+				JSONObject jObject;
+				int code=0;
+				String tickerText="";
+				String title="";
+				String content="";
+				int triggeringTime=0;
+				int NotificationId=0;
+				try {
+					jObject=new JSONObject(responseStr);
+					code=jObject.getInt("code");
+					if(0==code)
+					{
+//						tickerText=jObject.getString("tickerText");
+//						title=jObject.getString("title");
+//						content=jObject.getString("content");
+//						triggeringTime=jObject.getString("triggeringTime");
+//						NotificationId=jObject.getString("NotificationId");
+						JSONArray jsonArrays=jObject.getJSONArray("pushMessageArray");
+						int tmpMaxNotificationId=0;
+						for(int i=0;i<jsonArrays.length();i++)
+						{	
+							JSONObject jsonArray=jsonArrays.getJSONObject(i);
+							tickerText=jsonArray.getString("tickerText");
+							title=jsonArray.getString("title");
+							content=jsonArray.getString("content");
+							triggeringTime=jsonArray.getInt("triggeringTime");
+							NotificationId=jsonArray.getInt("notificationId");
+							if((triggeringTime>System.currentTimeMillis()/1000/60)&&(NotificationId>lastNotificationId)) {
+								addAlarmToNotification(NotificationId, triggeringTime, title, content, tickerText,context);
+//								scheduleNotificationInService(NotificationId, triggeringTime, title, content, tickerText, 0);
+								if(tmpMaxNotificationId<NotificationId)
+								{
+									Log.i(TAG,"NotificationId is:"+NotificationId);
+									tmpMaxNotificationId=NotificationId;
+								}
+							}
+						}
+						if(tmpMaxNotificationId!=0)
+						{
+							lastNotificationId=tmpMaxNotificationId;
+							Log.i(TAG,"set lastNotificationId is tmpMaxNotificationId:"+lastNotificationId);
+							//有更改的，要更新一下本地文件，更改为不在这里更新，而是设置mNotificationsModify之后在检查本地推送的时候统一更新
+						}else {
+							Log.i(TAG,"tmpMaxNotificationId value:"+tmpMaxNotificationId);
+						}
+					}else {
+						Log.i(TAG,"receivePushMessage getString:"+responseStr);
+					}
+				}catch (Exception e) {
+					// TODO: handle exception
+					e.printStackTrace();
+				}
+			}});
+		thread.start();
 	}
 	private String getServerPushMessage(int secsToWait,String urlStr,int port)
 	{
@@ -122,6 +129,8 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 	}
 	private void addAlarmToNotification(int notificationId,int triggerTimeMinute,String title,String content,String tickerText,Context context)
 	{
+		Log.i(TAG,"addAlarmToNotification notificationId:"+notificationId+" triggerTimeMinute:"+triggerTimeMinute+" title:"+title
+				+" content:"+content);
 		Intent intent=new Intent(context,AlarmReceiver.class);
 		intent.putExtra("notificationId", notificationId);
 		intent.putExtra("title", title);
