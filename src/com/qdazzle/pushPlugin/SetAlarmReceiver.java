@@ -140,11 +140,11 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 		if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.KITKAT)
 		{
 			Log.i(TAG,"set alarm to push "+triggerTimeMinute);
-			aManager.setExact(AlarmManager.RTC_WAKEUP, triggerTimeMinute*1000*60, pendingIntent);
+			aManager.setExact(AlarmManager.RTC_WAKEUP, ((long)triggerTimeMinute)*1000*60, pendingIntent);
 		}
 		else
 		{
-			aManager.set(AlarmManager.RTC_WAKEUP,triggerTimeMinute*1000*60,pendingIntent);
+			aManager.set(AlarmManager.RTC_WAKEUP,((long)triggerTimeMinute)*1000*60,pendingIntent);
 		}
 	}
 }
