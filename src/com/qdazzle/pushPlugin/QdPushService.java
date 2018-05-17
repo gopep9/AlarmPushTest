@@ -33,6 +33,7 @@ import java.lang.reflect.Method;
 
 import com.qdazzle.pushPlugin.aidl.INotificationService;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.AlarmManager;
@@ -43,6 +44,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.icu.util.Calendar;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -233,7 +235,8 @@ public class QdPushService extends Service{
 						/*
 						 * check local push time every other minute
 						 */
-						checkLocalPush(hasForeGround);
+						setAlertToPush(hasForeGround);
+//						checkLocalPush(hasForeGround);
 						try {
 							//间隔5秒
 							Thread.sleep(5000);
@@ -280,20 +283,6 @@ public class QdPushService extends Service{
 		return true;
 	}
 	
-//	private static boolean updateUserInfo()
-//	{
-//		if (mUserInfoNeedUpdate)
-//		{
-//			synchronized (mUserInfoLock) {
-//				mUserInfoNeedUpdate = false;
-//				mUserInfo = mTempUserInfo;
-//				mTempUserInfo = null;
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-
 	@Override
 	public void onCreate()
 	{
@@ -482,76 +471,7 @@ public class QdPushService extends Service{
 			strLastNotificationId="0";
 		return Integer.valueOf(strLastNotificationId);
 	}
-		
-	private void checkLocalPush(boolean hasForeground)
-	{
-		/*
-		 * check local push
-		 */
-		try
-		{
-			boolean changed = false;
-
-			long currentMinute = System.currentTimeMillis() / 1000 / 60;
-			// pick all notif who is time-out.
-			ArrayList<QdNotification> toPopList = new ArrayList<QdNotification>();
-			synchronized (mNotificationsLock)
-			{
-				changed = mNotificationsModify;
-				if (mNotifications.isEmpty())
-					return;
-
-				for (QdNotification note : mNotifications)
-				{
-					if (note.getTimeToNotify() <= currentMinute)
-					{
-						toPopList.add(note);
-					}
-				}
-			}
-			// pop notifications to system
-			for (QdNotification note : toPopList)
-			{
-				// pop notification only when no forground
-				// and pending notif is not out of date.
-				//到期的符合条件的进行推送，否则直接忽略
-				if (!hasForeground
-						&& currentMinute - note.getTimeToNotify() < OUT_OF_DATE_VAL)
-				{
-					popNotificationNow(note.getId(),
-							note.getTitle(), note.getContent(),note.getTickerText());
-				}
-				changed = true;
-			}
-
-			// change notif list, remove old notfi and update
-			// period notif
-			synchronized (mNotificationsLock)
-			{
-				for (QdNotification note : toPopList)
-				{
-					//在mNotifications里面直接移除到期的，对于周期推送的重新设置周期添加入mNotifications
-					mNotifications.remove(note);
-					if (note.getPeriod() > 0)
-					{
-						//原本是note.getTimeToNotify()+ note.getPeriod()的，现在改为用当前时间加上getPeriod
-						note.setTimeToNotify(System.currentTimeMillis()/1000/60+note.getPeriod());
-						mNotifications.add(note);
-					}
-				}
-			}
-
-			if (changed)
-			{
-				saveNotifDataToPreference();
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
+			
 	private void checkServerPush(int secsToWait,boolean hasForground)
 	{
 		String response="";
@@ -604,7 +524,7 @@ public class QdPushService extends Service{
 					Log.i(TAG,"set lastNotificationId is tmpMaxNotificationId:"+lastNotificationId);
 					//有更改的，要更新一下本地文件，更改为不在这里更新，而是设置mNotificationsModify之后在检查本地推送的时候统一更新
 					mNotificationsModify=true;
-//					saveNotifDataToPreference();
+					saveNotifDataToPreference();
 //					更新服务端发送的NotificationId的最大值
 					saveLastNotificationId(lastNotificationId);
 				}else {
@@ -617,19 +537,6 @@ public class QdPushService extends Service{
 			Log.e(TAG, "receivePushMessage exception:"+e.toString());
 			return;
 		}
-//		if(0==code||
-//				null!=tickerText||""!=tickerText||
-//				null!=title||""!=title||
-//				null!=content||""!=content||
-//				null!=triggeringTime||""!=triggeringTime||
-//				null!=NotificationId||""!=NotificationId)
-//		{
-//			//获取一个推送成功，添加到推送队列
-//			int LongTriggeringTime=Integer.parseInt(triggeringTime);
-//			if(LongTriggeringTime>System.currentTimeMillis()/1000/60) {
-//				scheduleNotificationInService(Integer.parseInt(NotificationId), Integer.parseInt(triggeringTime), title, content, 0);
-//			}
-//		}
 	}
 	
 	private String getServerPushMessage(int secsToWait,boolean hasForground,String urlStr,int port)
@@ -661,9 +568,28 @@ public class QdPushService extends Service{
 	//使用这个函数代替checkLocalPush
 	private void setAlertToPush(boolean hasForeground)
 	{
-		Bundle bundle=new Bundle();
-//		bundle.putInt(START_SERVICE_TYPE, TYPE_REQUEST);
-//		PendingIntent pendingIntent=getPendingIntent
-		
+		long currentMinute=System.currentTimeMillis() / 1000 / 60;
+		for(QdNotification note:mNotifications)
+		{
+			if(note.getTimeToNotify()>currentMinute)
+			{
+				Intent intent=new Intent(this,AlarmReceiver.class);
+				intent.putExtra("notificationId", note.getId());
+				intent.putExtra("title", note.getTitle());
+				intent.putExtra("content", note.getContent());
+				intent.putExtra("tickerText", note.getTickerText());
+				PendingIntent pendingIntent=PendingIntent.getBroadcast(this, note.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				AlarmManager am=(AlarmManager)getSystemService(Activity.ALARM_SERVICE);
+				if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.KITKAT)
+				{
+					am.setExact(AlarmManager.RTC_WAKEUP, note.getTimeToNotify()*1000*60, pendingIntent);
+				}
+				else 
+				{
+					am.set(AlarmManager.RTC_WAKEUP, note.getTimeToNotify()*1000*60, pendingIntent);
+				}
+			}
+		}
+		mNotifications.clear();
 	}
 }
