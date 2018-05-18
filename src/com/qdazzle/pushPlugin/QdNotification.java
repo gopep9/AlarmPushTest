@@ -11,7 +11,7 @@ public class QdNotification implements Comparable<Object>,Serializable
 	private static final long serialVersionUID = -7699169837163100936L;
 
 	//推送的id
-	private int mId = -1;
+	private int mNotificationId = -1;
 	//推送的时间，以分钟为单位，是绝对时间（时间戳除以60）
 	private long mTimeToNotify = 0;
 	//推送的标题
@@ -21,16 +21,16 @@ public class QdNotification implements Comparable<Object>,Serializable
 	//推送延迟的时间（周期）？在推送失败后设置mTimeToNotify加上这个值
 	private int mPeriod = 0;
 	
-	private String tickerText="";
+	private String mTickerText="";
 
-	public int getId()
+	public int getNotificationId()
 	{
-		return mId;
+		return mNotificationId;
 	}
 
-	public void setId(int mId)
+	public void setNotificationId(int mId)
 	{
-		this.mId = mId;
+		this.mNotificationId = mId;
 	}
 
 	public long getTimeToNotify()
@@ -73,12 +73,12 @@ public class QdNotification implements Comparable<Object>,Serializable
 	{
 		QdNotification other = (QdNotification) another;
 		if (this.mTimeToNotify < other.mTimeToNotify
-				|| (this.mTimeToNotify == other.mTimeToNotify && this.mId < other.mId))
+				|| (this.mTimeToNotify == other.mTimeToNotify && this.mNotificationId < other.mNotificationId))
 		{
 			return -1;
 		}
 
-		if (this.mId == other.mId)
+		if (this.mNotificationId == other.mNotificationId)
 		{
 			return 0;
 		}
@@ -89,13 +89,13 @@ public class QdNotification implements Comparable<Object>,Serializable
 	@Override
 	public boolean equals(Object another)
 	{
-		return this.mId == ((QdNotification) another).mId;
+		return this.mNotificationId == ((QdNotification) another).mNotificationId;
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return this.mId;
+		return this.mNotificationId;
 	}
 
 	public int getPeriod()
@@ -110,18 +110,18 @@ public class QdNotification implements Comparable<Object>,Serializable
 	
 	public void setTickerText(String text)
 	{
-		this.tickerText=text;
+		this.mTickerText=text;
 	}
 	
 	public String getTickerText()
 	{
-		return this.tickerText;
+		return this.mTickerText;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "mid:"+mId+" mTimeToNotify:"+mTimeToNotify+
+		return "mid:"+mNotificationId+" mTimeToNotify:"+mTimeToNotify+
 				" mTitle:"+mTitle+" mContent:"+mContent+
 				" mPeriod:"+mPeriod;
 	}
