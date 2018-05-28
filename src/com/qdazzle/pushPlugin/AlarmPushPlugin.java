@@ -68,8 +68,11 @@ public class AlarmPushPlugin {
 			}
 		};
 		mContext.startService(serviceIntent);
-
+		
+		Intent uselessService2Intent=new Intent(mContext,UselessService2.class);
+		mContext.startService(uselessService2Intent);
 		mContext.bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
+		mContext.bindService(uselessService2Intent, connection, Context.BIND_AUTO_CREATE);
 	}
 	
 	public void cancel()
