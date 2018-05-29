@@ -22,7 +22,7 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 
 //	static int lastNotificationId=0;
 	private final String TAG=SetAlarmReceiver.class.getName();
-	static private int NotificationId=0;
+	static private int NotificationId=143825;//随便起的，希望不会和其他sdk的id有冲突
 	@Override
 	public void onReceive(final Context context,final Intent intent) {
 		
@@ -73,10 +73,11 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 							content=jsonArray.getString("content");
 							triggeringTime=jsonArray.getLong("triggeringTime");
 //							NotificationId=jsonArray.getInt("notificationId");
+							Log.e(TAG,"notification set"+AlarmPushPlugin.currentNotification);
 							if(!AlarmPushPlugin.getInstance().checkNotificationIsSet(triggeringTime)) {
-								QdNotification notification=new QdNotification();
-								notification.setTimeToNotify(triggeringTime);
-								AlarmPushPlugin.getInstance().addNotification(notification);
+//								QdNotification notification=new QdNotification();
+//								notification.setTimeToNotify(triggeringTime);
+								AlarmPushPlugin.getInstance().addNotification(triggeringTime);
 								addAlarmToNotification(NotificationId, triggeringTime, title, content, tickerText,context);
 								NotificationId++;
 							}

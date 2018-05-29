@@ -26,7 +26,8 @@ public class AlarmPushPlugin {
 	}
 	private static Context mContext=null;
 	private static PendingIntent alarmIntent=null;
-	private static Set<QdNotification> currentNotification = new TreeSet<QdNotification>();
+//	public static Set<QdNotification> currentNotification = new TreeSet<QdNotification>();
+	public static Set<Long>currentNotification=new TreeSet<Long>();
 	
 	public void init(Context context,String url,int port,String platformId,String channelId,
 			String NotificationPackId,String packageId,int requestPeriod)
@@ -95,19 +96,20 @@ public class AlarmPushPlugin {
 		return (AlarmManager)mContext.getSystemService(Activity.ALARM_SERVICE);
 	}
 	
-	public void addNotification(QdNotification notification)
+	public void addNotification(long minute)
 	{
 		//假如同一时间的推送已经被设置的话直接返回
-		if(checkNotificationIsSet(notification.getTimeToNotify()))
+		if(checkNotificationIsSet(minute))
 		{
 			return;
 		}
-		currentNotification.add(notification);
+		Log.e(TAG,"currentNotification.add"+minute);
+		currentNotification.add(minute);
 	}
 	public boolean checkNotificationIsSet(long minute)
 	{
-		for(QdNotification notification:currentNotification) {
-			if(notification.getTimeToNotify()==minute)
+		for(Long notification:currentNotification) {
+			if(notification==minute)
 			{
 				return true;
 			}
@@ -116,8 +118,8 @@ public class AlarmPushPlugin {
 	}
 	public void deleteNotification(long minute)
 	{
-		for(QdNotification notification:currentNotification) {
-			if(notification.getTimeToNotify()==minute)
+		for(Long notification:currentNotification) {
+			if(notification==minute)
 			{
 				currentNotification.remove(notification);
 				break;
