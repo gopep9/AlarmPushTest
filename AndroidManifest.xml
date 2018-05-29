@@ -41,7 +41,18 @@
                 <action android:name="com.qdazzle.pushPlugin.SetAlarmReceiverAction"/>
             </intent-filter>  
         </receiver>
+        <receiver 
+            android:name="com.qdazzle.pushPlugin.NotificationReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter >
+                <action android:name="com.qdazzle.pushPlugin.NotificationReceiverAction"/>
+            </intent-filter>
+        </receiver>
         <service android:name="com.qdazzle.pushPlugin.UselessService">
+            
+        </service>
+        <service android:name="com.qdazzle.pushPlugin.UselessService2">
             
         </service>
         

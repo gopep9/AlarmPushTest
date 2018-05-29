@@ -50,29 +50,29 @@ public class AlarmPushPlugin {
 			getAlarmManager().setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),requestPeriod*1000*60, alarmIntent);
 		}
 		
-		Intent serviceIntent=new Intent(mContext,UselessService.class);
-		
-		//连接没用的服务
-		ServiceConnection connection = new ServiceConnection() {
-			
-			@Override
-			public void onServiceDisconnected(ComponentName name) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onServiceConnected(ComponentName name, IBinder service) {
-				// TODO Auto-generated method stub
-				
-			}
-		};
-		mContext.startService(serviceIntent);
-		
-		Intent uselessService2Intent=new Intent(mContext,UselessService2.class);
-		mContext.startService(uselessService2Intent);
-		mContext.bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
-		mContext.bindService(uselessService2Intent, connection, Context.BIND_AUTO_CREATE);
+//		Intent serviceIntent=new Intent(mContext,UselessService.class);
+//		
+//		//连接没用的服务
+//		ServiceConnection connection = new ServiceConnection() {
+//			
+//			@Override
+//			public void onServiceDisconnected(ComponentName name) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//			
+//			@Override
+//			public void onServiceConnected(ComponentName name, IBinder service) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//		};
+//		mContext.startService(serviceIntent);
+//		
+//		Intent uselessService2Intent=new Intent(mContext,UselessService2.class);
+//		mContext.startService(uselessService2Intent);
+//		mContext.bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
+//		mContext.bindService(uselessService2Intent, connection, Context.BIND_AUTO_CREATE);
 	}
 	
 	public void cancel()

@@ -34,7 +34,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 		messageNotification.flags=Notification.FLAG_AUTO_CANCEL;
 		messageNotificationManager=(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 		//点击按钮后要启动的intent
-		Intent messageIntent=new Intent(context,MainActivity.class);
+		Intent messageIntent=new Intent(context,NotificationReceiver.class);
 		PendingIntent messagePendingIntent=PendingIntent.getActivity(context, notificationId, messageIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		//通过反射兼容16以下的sdk
 		Class notificationClass=messageNotification.getClass();
