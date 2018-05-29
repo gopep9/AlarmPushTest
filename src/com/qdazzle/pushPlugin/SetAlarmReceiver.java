@@ -32,7 +32,7 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 			public void run() {
 				// TODO Auto-generated method stub
 				Log.i(TAG,"onReceiver and intent is "+intent.toString());
-				Log.i(TAG,"current minute "+System.currentTimeMillis()/1000/60);
+				Log.i(TAG,"current minute "+currentMinute());
 //				Log.i(TAG,"current lastNotificationId "+lastNotificationId);
 				String url=intent.getStringExtra("url");
 				int port=intent.getIntExtra("port", 80);
@@ -74,7 +74,7 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 							triggeringTime=jsonArray.getLong("triggeringTime");
 //							NotificationId=jsonArray.getInt("notificationId");
 							Log.e(TAG,"notification set"+AlarmPushPlugin.currentNotification);
-							if(!AlarmPushPlugin.getInstance().checkNotificationIsSet(triggeringTime)) {
+							if(!AlarmPushPlugin.getInstance().checkNotificationIsSet(triggeringTime)&&triggeringTime>currentMinute()) {
 //								QdNotification notification=new QdNotification();
 //								notification.setTimeToNotify(triggeringTime);
 								AlarmPushPlugin.getInstance().addNotification(triggeringTime);
@@ -137,5 +137,10 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 		{
 			aManager.set(AlarmManager.RTC_WAKEUP,((long)triggerTimeMinute)*1000*60,pendingIntent);
 		}
+	}
+	
+	private long currentMinute()
+	{
+		return System.currentTimeMillis()/1000/60;
 	}
 }
