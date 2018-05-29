@@ -20,8 +20,9 @@ import android.util.Log;
 //使用闹钟实现向服务器请求推送内容和设置推送内容
 public class SetAlarmReceiver extends BroadcastReceiver{
 
-	static int lastNotificationId=0;
+//	static int lastNotificationId=0;
 	private final String TAG=SetAlarmReceiver.class.getName();
+	static private int NotificationId=0;
 	@Override
 	public void onReceive(final Context context,final Intent intent) {
 		
@@ -32,7 +33,7 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 				// TODO Auto-generated method stub
 				Log.i(TAG,"onReceiver and intent is "+intent.toString());
 				Log.i(TAG,"current minute "+System.currentTimeMillis()/1000/60);
-				Log.i(TAG,"current lastNotificationId "+lastNotificationId);
+//				Log.i(TAG,"current lastNotificationId "+lastNotificationId);
 				String url=intent.getStringExtra("url");
 				int port=intent.getIntExtra("port", 80);
 				String platformId=intent.getStringExtra("platformId");
@@ -51,8 +52,7 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 				String tickerText="";
 				String title="";
 				String content="";
-				int triggeringTime=0;
-				int NotificationId=0;
+				long triggeringTime=0;
 				try {
 					jObject=new JSONObject(responseStr);
 					code=jObject.getInt("code");
@@ -64,32 +64,22 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 //						triggeringTime=jObject.getString("triggeringTime");
 //						NotificationId=jObject.getString("NotificationId");
 						JSONArray jsonArrays=jObject.getJSONArray("pushMessageArray");
-						int tmpMaxNotificationId=0;
+//						int tmpMaxNotificationId=0;
 						for(int i=0;i<jsonArrays.length();i++)
 						{	
 							JSONObject jsonArray=jsonArrays.getJSONObject(i);
 							tickerText=jsonArray.getString("tickerText");
 							title=jsonArray.getString("title");
 							content=jsonArray.getString("content");
-							triggeringTime=jsonArray.getInt("triggeringTime");
-							NotificationId=jsonArray.getInt("notificationId");
-							if((triggeringTime>System.currentTimeMillis()/1000/60)&&(NotificationId>lastNotificationId)) {
+							triggeringTime=jsonArray.getLong("triggeringTime");
+//							NotificationId=jsonArray.getInt("notificationId");
+							if(!AlarmPushPlugin.getInstance().checkNotificationIsSet(triggeringTime)) {
+								QdNotification notification=new QdNotification();
+								notification.setTimeToNotify(triggeringTime);
+								AlarmPushPlugin.getInstance().addNotification(notification);
 								addAlarmToNotification(NotificationId, triggeringTime, title, content, tickerText,context);
-//								scheduleNotificationInService(NotificationId, triggeringTime, title, content, tickerText, 0);
-								if(tmpMaxNotificationId<NotificationId)
-								{
-									Log.i(TAG,"NotificationId is:"+NotificationId);
-									tmpMaxNotificationId=NotificationId;
-								}
+								NotificationId++;
 							}
-						}
-						if(tmpMaxNotificationId!=0)
-						{
-							lastNotificationId=tmpMaxNotificationId;
-							Log.i(TAG,"set lastNotificationId is tmpMaxNotificationId:"+lastNotificationId);
-							//有更改的，要更新一下本地文件，更改为不在这里更新，而是设置mNotificationsModify之后在检查本地推送的时候统一更新
-						}else {
-							Log.i(TAG,"tmpMaxNotificationId value:"+tmpMaxNotificationId);
 						}
 					}else {
 						Log.i(TAG,"receivePushMessage getString:"+responseStr);
@@ -126,7 +116,7 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 		}
 		return "";
 	}
-	private void addAlarmToNotification(int notificationId,int triggerTimeMinute,String title,String content,String tickerText,Context context)
+	private void addAlarmToNotification(int notificationId,long triggerTimeMinute,String title,String content,String tickerText,Context context)
 	{
 		Log.i(TAG,"addAlarmToNotification notificationId:"+notificationId+" triggerTimeMinute:"+triggerTimeMinute+" title:"+title
 				+" content:"+content);
