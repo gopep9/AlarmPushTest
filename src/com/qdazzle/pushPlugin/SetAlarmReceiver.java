@@ -33,7 +33,6 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 				// TODO Auto-generated method stub
 				Log.i(TAG,"onReceiver and intent is "+intent.toString());
 				Log.i(TAG,"current minute "+currentMinute());
-//				Log.i(TAG,"current lastNotificationId "+lastNotificationId);
 				String url=intent.getStringExtra("url");
 				int port=intent.getIntExtra("port", 80);
 				String platformId=intent.getStringExtra("platformId");
@@ -58,13 +57,7 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 					code=jObject.getInt("code");
 					if(0==code)
 					{
-//						tickerText=jObject.getString("tickerText");
-//						title=jObject.getString("title");
-//						content=jObject.getString("content");
-//						triggeringTime=jObject.getString("triggeringTime");
-//						NotificationId=jObject.getString("NotificationId");
 						JSONArray jsonArrays=jObject.getJSONArray("pushMessageArray");
-//						int tmpMaxNotificationId=0;
 						for(int i=0;i<jsonArrays.length();i++)
 						{	
 							JSONObject jsonArray=jsonArrays.getJSONObject(i);
@@ -75,8 +68,6 @@ public class SetAlarmReceiver extends BroadcastReceiver{
 //							NotificationId=jsonArray.getInt("notificationId");
 							Log.e(TAG,"notification set"+AlarmPushPlugin.currentNotification);
 							if(!AlarmPushPlugin.getInstance().checkNotificationIsSet(triggeringTime)&&triggeringTime>currentMinute()) {
-//								QdNotification notification=new QdNotification();
-//								notification.setTimeToNotify(triggeringTime);
 								AlarmPushPlugin.getInstance().addNotification(triggeringTime);
 								addAlarmToNotification(NotificationId, triggeringTime, title, content, tickerText,context);
 								NotificationId++;
