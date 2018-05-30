@@ -41,12 +41,6 @@
                 <action android:name="com.qdazzle.pushPlugin.SetAlarmReceiverAction"/>
             </intent-filter>  
         </receiver>
-        <service android:name="com.qdazzle.pushPlugin.UselessService">
-            
-        </service>
-        <service android:name="com.qdazzle.pushPlugin.UselessService2">
-            
-        </service>
         
     </application>
 
