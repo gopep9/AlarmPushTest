@@ -10,8 +10,6 @@ import java.net.URL;
 import org.json.JSONObject;
 
 import com.qdazzle.pushPlugin.AlarmPushPlugin;
-import com.qdazzle.pushPlugin.QdNotification;
-import com.qdazzle.pushPlugin.aidl.INotificationService;
 
 import android.app.Activity;
 import android.app.AlarmManager;
